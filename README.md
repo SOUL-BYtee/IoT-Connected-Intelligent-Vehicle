@@ -8,6 +8,12 @@ Graduation project, Faculty of Engineering, Zagazig University (Electronics and 
 ![Gazebo](https://img.shields.io/badge/Simulation-Gazebo-FF6F00)
 ![MQTT](https://img.shields.io/badge/IoT-MQTT_%7C_EMQX-660066)
 ![Status](https://img.shields.io/badge/Status-In_development-yellow)
+![Orange Pi](https://img.shields.io/badge/Hardware-Orange_Pi-D7511A)
+![STM32](https://img.shields.io/badge/MCU-STM32-03234B?logo=stmicroelectronics&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white)
+![Kafka](https://img.shields.io/badge/Kafka-231F20?logo=apachekafka&logoColor=white)
+![Spark](https://img.shields.io/badge/Spark-E25A1C?logo=apachespark&logoColor=white)
+![BigQuery](https://img.shields.io/badge/BigQuery-669DF6?logo=googlebigquery&logoColor=white)
 
 ## Table of contents
 
