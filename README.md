@@ -4,8 +4,9 @@ An autonomous ground vehicle that navigates on its own and streams its data to t
 
 Graduation project, Faculty of Engineering, Zagazig University (Electronics and Communications Engineering). Supervised by Dr. Azhar.
 
-![ROS 2](https://img.shields.io/badge/ROS_2-Nav2-22314E?logo=ros&logoColor=white)
-![Gazebo](https://img.shields.io/badge/Simulation-Gazebo-FF6F00)
+![Status](https://img.shields.io/badge/Status-In_Development-yellow)
+![ROS 2](https://img.shields.io/badge/ROS_2-Jazzy-22314E?logo=ros&logoColor=white)
+![Gazebo](https://img.shields.io/badge/Simulation-Gazebo_Harmonic-FF6F00)
 ![MQTT](https://img.shields.io/badge/IoT-MQTT_%7C_EMQX-660066)
 ![Orange Pi](https://img.shields.io/badge/Hardware-Orange_Pi-D7511A)
 ![STM32](https://img.shields.io/badge/MCU-STM32-03234B?logo=stmicroelectronics&logoColor=white)
@@ -22,6 +23,8 @@ Graduation project, Faculty of Engineering, Zagazig University (Electronics and 
 
 - [Project overview](#project-overview)
 - [System architecture](#system-architecture)
+- [Roadmap](#roadmap)
+- [Repository structure](#repository-structure)
 - [Data Engineering](#data-engineering)
 - [ROS 2](#ros-2)
 - [Embedded Systems](#embedded-systems)
@@ -47,16 +50,54 @@ The diagram at the top of this page shows the full system.
 
 The microcontroller handles real-time control of the motors and sensors. ROS 2 handles perception and navigation and talks to the microcontroller through a bridge node. Telemetry leaves the vehicle over MQTT, reaches the cloud, and feeds the data pipelines.
 
-## Project roadmap
+## Roadmap
+
+The project is planned in three phases. Software work comes first, so it does not wait for the hardware.
+
+**Phase 1: Simulation and software (no hardware needed)**
 
 - [x] ROS 2 workspace and environment setup
 - [x] Robot model (URDF / xacro)
 - [x] Gazebo simulation and RViz visualization
-- [ ] Nav2 navigation stack (in progress)
+- [x] Sending Nav2 goals from Python code
+- [x] Map of the simulated world (SLAM) saved for navigation
+- [ ] Nav2 parameters tuned to our robot
 - [ ] STM32 bridge node
 - [ ] MQTT telemetry to EMQX
 - [ ] Single package with one launch file
-- [ ] Hardware phase: chassis, lidar, encoders and IMU
+
+**Phase 2: Decisions before buying hardware**
+
+- [x] Chassis: 4 wheels, skid-steer
+- [x] Proximity safety sensor: ToF
+- [ ] Lidar model (must have a ROS 2 Jazzy driver)
+- [ ] Wheel encoders
+- [ ] IMU (optional)
+
+**Phase 3: Hardware**
+
+- [ ] Build the chassis and wire the sensors
+- [ ] Set up the onboard computer (Orange Pi) with Ubuntu 24.04 and ROS 2
+- [ ] Calibrate odometry
+- [ ] Tune Nav2 on the real robot
+
+The Cloud and Data Engineering work (broker, services, pipelines, dashboards) is tracked by those teams in their own sections.
+
+## Repository structure
+
+```text
+.
+├── docs/            # architecture diagram, demo media
+├── ros2/
+│   ├── models/      # robot description (URDF / xacro)
+│   ├── launch/      # launch files
+│   ├── config/      # Nav2 and bridge parameters
+│   ├── maps/        # saved maps
+│   └── scripts/     # helper scripts (e.g. goal.py)
+└── README.md
+```
+
+Each team adds its own folder next to `ros2/` when it has files to share.
 
 ---
 
@@ -100,27 +141,32 @@ The ROS 2 team owns the vehicle's software brain: the robot model, the simulatio
 
 ### Status
 
-Simulation and visualization are done. Nav2 navigation is in progress. The STM32 bridge, MQTT telemetry and final packaging are next.
-
-- [x] Workspace and environment setup
-- [x] Robot model
-- [x] Gazebo simulation and RViz visualization
-- [ ] Nav2 navigation stack (in progress)
-- [ ] STM32 bridge node
-- [ ] MQTT telemetry to EMQX
-- [ ] Single package with one launch file
+Simulation, visualization, mapping and goal sending are done. Next is tuning Nav2 to our own robot, then the STM32 bridge, MQTT telemetry and final packaging. See the [Roadmap](#roadmap) for the full list.
 
 ### Quick start
 
-Requires ROS 2 with Nav2 and xacro, Gazebo Sim with `ros_gz`, and RViz. From the repository root:
+**Requirements:** ROS 2 **Jazzy** with Nav2 and xacro, Gazebo **Harmonic** with `ros_gz`, and RViz.
+
+From the repository root:
 
 ```bash
-ros2 launch ros2/launch/view_robot.launch.py      # view the robot in RViz
-ros2 launch ros2/launch/gazebo_robot.launch.py    # run the Gazebo simulation
-python3 ros2/scripts/goal.py 1.0 0.5              # send a Nav2 goal
+# 1. View the robot model in RViz
+ros2 launch ros2/launch/view_robot.launch.py
+
+# 2. Run our robot in Gazebo (drive it with teleop)
+ros2 launch ros2/launch/gazebo_robot.launch.py
+
+# 3. Run Nav2 on the saved map
+ros2 launch nav2_bringup tb3_simulation_launch.py headless:=False map:=ros2/maps/my_map.yaml
+
+# 4. Send a goal. The first time, add --init to set the initial pose (once only)
+python3 ros2/scripts/goal.py 1.0 0.5 --init
+python3 ros2/scripts/goal.py 2.0 1.0
 ```
 
-Code lives in [`ros2/`](ros2/): `models/`, `launch/`, `config/`, `maps/`, `scripts/`.
+Note: step 3 currently runs on the TurtleBot3 demo robot that ships with Nav2, using the map we saved from that simulation. Once Nav2 is tuned to our own robot, this step will use our robot instead.
+
+Code lives in [`ros2/`](ros2/).
 
 ---
 
@@ -182,15 +228,23 @@ The Hardware team owns the physical vehicle. It selects, assembles and wires the
 **Responsibilities**
 
 - Chassis and drivetrain
-- Sensors: lidar, wheel encoders and IMU
+- Sensors: lidar, wheel encoders, IMU and the ToF proximity sensor
 - Power supply and wiring
 - Mounting of the controller and compute boards
 
 ### Status
 
-Component selection for the lidar, encoders and IMU is the next planned step. The team adds the parts list, schematics, photos and build notes below.
+The chassis type is decided (4 wheels, skid-steer) and so is the ToF proximity sensor. Component selection for the lidar, encoders and IMU is the next planned step. The team adds the parts list, schematics, photos and build notes below.
 
 ---
+
+<!-- ===================== TEAM (add at the end of the project) =====================
+## Team
+
+| Name | Team | GitHub |
+| --- | --- | --- |
+|  |  |  |
+-->
 
 ## Contributing
 
