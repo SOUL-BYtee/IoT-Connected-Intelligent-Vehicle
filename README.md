@@ -7,7 +7,6 @@ Graduation project, Faculty of Engineering, Zagazig University (Electronics and 
 ![ROS 2](https://img.shields.io/badge/ROS_2-Nav2-22314E?logo=ros&logoColor=white)
 ![Gazebo](https://img.shields.io/badge/Simulation-Gazebo-FF6F00)
 ![MQTT](https://img.shields.io/badge/IoT-MQTT_%7C_EMQX-660066)
-![Status](https://img.shields.io/badge/Status-In_development-yellow)
 ![Orange Pi](https://img.shields.io/badge/Hardware-Orange_Pi-D7511A)
 ![STM32](https://img.shields.io/badge/MCU-STM32-03234B?logo=stmicroelectronics&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white)
