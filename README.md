@@ -14,6 +14,10 @@ Graduation project, Faculty of Engineering, Zagazig University (Electronics and 
 ![Spark](https://img.shields.io/badge/Spark-E25A1C?logo=apachespark&logoColor=white)
 ![BigQuery](https://img.shields.io/badge/BigQuery-669DF6?logo=googlebigquery&logoColor=white)
 
+<p align="center">
+  <img src="docs/architecture.svg" alt="System architecture of the IoT-Connected Intelligent Vehicle" width="100%">
+</p>
+
 ## Table of contents
 
 - [Project overview](#project-overview)
@@ -39,13 +43,7 @@ The goal of this project is a vehicle that senses its surroundings, plans a rout
 
 ## System architecture
 
-```
-Sensors and motors  <->  Embedded Systems (STM32)  <->  ROS 2 (navigation)
-                                                              |
-                                                     MQTT (EMQX broker)
-                                                              |
-                                              Cloud services  ->  Data Engineering
-```
+The diagram at the top of this page shows the full system.
 
 The microcontroller handles real-time control of the motors and sensors. ROS 2 handles perception and navigation and talks to the microcontroller through a bridge node. Telemetry leaves the vehicle over MQTT, reaches the cloud, and feeds the data pipelines.
 
