@@ -5,9 +5,6 @@ Graduation project, Faculty of Engineering, Zagazig University. Supervised by Dr
 An intelligent ground vehicle with autonomous navigation built on ROS 2 and Nav2,
 simulated in Gazebo, with an IoT link (MQTT / EMQX) for remote monitoring and control.
 
-This is the team repository. The project is split into five teams. Each team owns
-one section of this README and edits only that section, so nobody overwrites
-another team's work.
 
 ## Contents
 
