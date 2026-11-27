@@ -139,11 +139,8 @@ The Embedded Systems team owns the firmware that runs on the STM32 microcontroll
 
 ### Status
 
-Not started in this repository yet. The team adds firmware, pin maps, wiring notes and build instructions below.
+The team adds firmware, pin maps, wiring notes and build instructions below.
 
-### Work done
-
-_No entries yet._
 
 ---
 
@@ -165,11 +162,8 @@ The Cloud team owns the link between the vehicle and the internet. It runs the M
 
 ### Status
 
-Not started in this repository yet. The team adds architecture notes, topic lists and setup steps below.
+The team adds architecture notes, topic lists and setup steps below.
 
-### Work done
-
-_No entries yet._
 
 ---
 
@@ -191,11 +185,7 @@ The Hardware team owns the physical vehicle. It selects, assembles and wires the
 
 ### Status
 
-Not started in this repository yet. Component selection for the lidar, encoders and IMU is the next planned step. The team adds the parts list, schematics, photos and build notes below.
-
-### Work done
-
-_No entries yet._
+Component selection for the lidar, encoders and IMU is the next planned step. The team adds the parts list, schematics, photos and build notes below.
 
 ---
 
