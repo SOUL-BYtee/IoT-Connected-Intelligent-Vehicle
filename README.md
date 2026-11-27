@@ -1,43 +1,59 @@
 # IoT-Connected Intelligent Vehicle
 
-Graduation project, Faculty of Engineering, Zagazig University. Supervised by Dr. Azhar.
+An autonomous ground vehicle that navigates on its own and streams its data to the cloud for remote monitoring and control.
 
-An intelligent ground vehicle with autonomous navigation built on ROS 2 and Nav2,
-simulated in Gazebo, with an IoT link (MQTT / EMQX) for remote monitoring and control.
+Graduation project, Faculty of Engineering, Zagazig University (Electronics and Communications Engineering). Supervised by Dr. Azhar.
 
+![ROS 2](https://img.shields.io/badge/ROS_2-Nav2-22314E?logo=ros&logoColor=white)
+![Gazebo](https://img.shields.io/badge/Simulation-Gazebo-FF6F00)
+![MQTT](https://img.shields.io/badge/IoT-MQTT_%7C_EMQX-660066)
+![Status](https://img.shields.io/badge/Status-In_development-yellow)
 
-## Contents
+## Table of contents
 
 - [Project overview](#project-overview)
+- [System architecture](#system-architecture)
 - [Data Engineering](#data-engineering)
 - [ROS 2](#ros-2)
 - [Embedded Systems](#embedded-systems)
 - [Cloud](#cloud)
 - [Hardware](#hardware)
-- [Team workflow](#team-workflow)
+- [Contributing](#contributing)
 
 ## Project overview
 
-The vehicle senses its surroundings, plans a path and drives itself. Four layers work together:
+The goal of this project is a vehicle that senses its surroundings, plans a route to a goal and drives itself there, while reporting its state to the cloud in real time. The work is split between five teams. Each team owns one part of the system and documents it in its own section below.
 
-| Layer | Team | What it does |
-| --- | --- | --- |
-| Navigation and simulation | ROS 2 | Robot model, Gazebo, Nav2, goal sending |
-| Low-level control | Embedded Systems | STM32 firmware that drives motors and reads sensors |
-| Connectivity and storage | Cloud | MQTT broker (EMQX) and cloud services for telemetry |
-| Data | Data Engineering | Pipelines that collect, process and store vehicle data |
-| Physical build | Hardware | Chassis, lidar, encoders, IMU and power |
+| Team | Responsibility |
+| --- | --- |
+| [Data Engineering](#data-engineering) | Collecting, processing and storing the data the vehicle produces |
+| [ROS 2](#ros-2) | Robot model, simulation and autonomous navigation |
+| [Embedded Systems](#embedded-systems) | Firmware on the microcontroller that drives the motors and reads the sensors |
+| [Cloud](#cloud) | Connectivity between the vehicle and the cloud, and the cloud services behind it |
+| [Hardware](#hardware) | The physical vehicle: chassis, actuators, sensors and power |
 
-Overall roadmap:
+## System architecture
+
+```
+Sensors and motors  <->  Embedded Systems (STM32)  <->  ROS 2 (navigation)
+                                                              |
+                                                     MQTT (EMQX broker)
+                                                              |
+                                              Cloud services  ->  Data Engineering
+```
+
+The microcontroller handles real-time control of the motors and sensors. ROS 2 handles perception and navigation and talks to the microcontroller through a bridge node. Telemetry leaves the vehicle over MQTT, reaches the cloud, and feeds the data pipelines.
+
+## Project roadmap
 
 - [x] ROS 2 workspace and environment setup
 - [x] Robot model (URDF / xacro)
-- [x] Gazebo simulation + RViz visualization
+- [x] Gazebo simulation and RViz visualization
 - [ ] Nav2 navigation stack (in progress)
 - [ ] STM32 bridge node
 - [ ] MQTT telemetry to EMQX
-- [ ] Single package + one launch file
-- [ ] Hardware phase: chassis, lidar, encoders and IMU selection
+- [ ] Single package with one launch file
+- [ ] Hardware phase: chassis, lidar, encoders and IMU
 
 ---
 
@@ -46,13 +62,23 @@ Overall roadmap:
 
 ## Data Engineering
 
-### About this section
+### Introduction
 
-Owned by the Data Engineering team. Replace this paragraph with what the team is responsible for in the project (for example: which data the vehicle produces, how it is collected, processed and stored).
+The Data Engineering team turns the raw data the vehicle produces into something the project can use. It designs the pipelines that ingest telemetry arriving from the cloud, process it, and store it for analysis and visualization.
 
-### Progress and work done
+**Responsibilities**
 
-_Nothing added yet. The team adds finished work, diagrams, setup steps and links here._
+- Define the data the vehicle produces (sensor readings, pose, status) and its schema
+- Build ingestion and processing pipelines
+- Store the data and make it available for analysis and dashboards
+
+### Status
+
+Not started in this repository yet. The team adds architecture notes, setup steps and results below.
+
+### Work done
+
+_No entries yet._
 
 ---
 
@@ -61,61 +87,40 @@ _Nothing added yet. The team adds finished work, diagrams, setup steps and links
 
 ## ROS 2
 
-### About this section
+### Introduction
 
-Owned by the ROS 2 team. Responsible for the robot model, the Gazebo simulation, RViz visualization and the Nav2 autonomous navigation stack.
+The ROS 2 team owns the vehicle's software brain: the robot model, the simulation, and the autonomous navigation stack built on Nav2. It also owns the bridge that will connect ROS 2 to the embedded controller and to MQTT.
 
-### Repository structure
+**Responsibilities**
 
-```
-ros2/
-  models/    Robot description: URDF + xacro sources (my_robot)
-  launch/    Launch files: RViz viewer and Gazebo simulation
-  config/    ros_gz bridge configuration
-  maps/      Occupancy grid map for Nav2 (pgm + yaml)
-  scripts/   Helper scripts (Nav2 goal sender)
-```
+- Robot description (URDF / xacro)
+- Gazebo simulation and RViz visualization
+- Mapping, localization and path planning with Nav2
+- Integration with the STM32 and MQTT telemetry
 
-### Requirements
+### Status
 
-- ROS 2 with Nav2 and xacro
-- Gazebo Sim with ros_gz (`ros_gz_sim`, `ros_gz_bridge`)
-- RViz and `joint_state_publisher_gui` for the viewer
+Simulation and visualization are done. Nav2 navigation is in progress. The STM32 bridge, MQTT telemetry and final packaging are next.
+
+- [x] Workspace and environment setup
+- [x] Robot model
+- [x] Gazebo simulation and RViz visualization
+- [ ] Nav2 navigation stack (in progress)
+- [ ] STM32 bridge node
+- [ ] MQTT telemetry to EMQX
+- [ ] Single package with one launch file
 
 ### Quick start
 
-Clone the repository, then from the repository root.
-
-View the robot in RViz:
+Requires ROS 2 with Nav2 and xacro, Gazebo Sim with `ros_gz`, and RViz. From the repository root:
 
 ```bash
-ros2 launch ros2/launch/view_robot.launch.py
+ros2 launch ros2/launch/view_robot.launch.py      # view the robot in RViz
+ros2 launch ros2/launch/gazebo_robot.launch.py    # run the Gazebo simulation
+python3 ros2/scripts/goal.py 1.0 0.5              # send a Nav2 goal
 ```
 
-Run the Gazebo simulation:
-
-```bash
-ros2 launch ros2/launch/gazebo_robot.launch.py
-```
-
-Send a navigation goal (with Nav2 running):
-
-```bash
-python3 ros2/scripts/goal.py 1.0 0.5
-```
-
-The launch files resolve their paths relative to the repository, so they work
-from any clone location.
-
-### Progress
-
-- [x] Step 1: Workspace and environment setup
-- [x] Step 2: Robot model (URDF / xacro)
-- [x] Step 3: Gazebo simulation + RViz visualization
-- [ ] Step 4: Nav2 navigation stack (in progress)
-- [ ] Step 5: STM32 bridge node
-- [ ] Step 6: MQTT telemetry to EMQX
-- [ ] Step 7: Single package + one launch file
+Code lives in [`ros2/`](ros2/): `models/`, `launch/`, `config/`, `maps/`, `scripts/`.
 
 ---
 
@@ -124,13 +129,24 @@ from any clone location.
 
 ## Embedded Systems
 
-### About this section
+### Introduction
 
-Owned by the Embedded Systems team. Replace this paragraph with what the team is responsible for (for example: the STM32 firmware, motor control, sensor reading and the link to the ROS 2 side).
+The Embedded Systems team owns the firmware that runs on the STM32 microcontroller. It is the real-time layer between the physical vehicle and ROS 2: it drives the motors, reads the sensors and exchanges commands and measurements with the navigation software.
 
-### Progress and work done
+**Responsibilities**
 
-_Nothing added yet. The team adds finished work, pin maps, wiring notes and build instructions here._
+- Motor control and speed regulation
+- Reading encoders, IMU and other sensors
+- Communication protocol with the ROS 2 bridge node
+- Safety behavior, such as stopping on lost communication
+
+### Status
+
+Not started in this repository yet. The team adds firmware, pin maps, wiring notes and build instructions below.
+
+### Work done
+
+_No entries yet._
 
 ---
 
@@ -139,13 +155,24 @@ _Nothing added yet. The team adds finished work, pin maps, wiring notes and buil
 
 ## Cloud
 
-### About this section
+### Introduction
 
-Owned by the Cloud team. Replace this paragraph with what the team is responsible for (for example: the MQTT broker on EMQX, cloud services and remote monitoring and control).
+The Cloud team owns the link between the vehicle and the internet. It runs the MQTT broker (EMQX), manages the cloud services that receive telemetry, and provides the path for remote monitoring and control.
 
-### Progress and work done
+**Responsibilities**
 
-_Nothing added yet. The team adds finished work, architecture notes and setup steps here._
+- MQTT broker setup, topics and access control
+- Cloud deployment and services for telemetry
+- Secure remote monitoring and control of the vehicle
+- Handing data over to the Data Engineering pipelines
+
+### Status
+
+Not started in this repository yet. The team adds architecture notes, topic lists and setup steps below.
+
+### Work done
+
+_No entries yet._
 
 ---
 
@@ -154,20 +181,31 @@ _Nothing added yet. The team adds finished work, architecture notes and setup st
 
 ## Hardware
 
-### About this section
+### Introduction
 
-Owned by the Hardware team. Replace this paragraph with what the team is responsible for (for example: chassis, lidar, encoders, IMU, motors and power).
+The Hardware team owns the physical vehicle. It selects, assembles and wires the chassis, motors, sensors and power system that the other teams build on.
 
-### Progress and work done
+**Responsibilities**
 
-_Nothing added yet. The team adds the parts list, schematics, photos and build notes here._
+- Chassis and drivetrain
+- Sensors: lidar, wheel encoders and IMU
+- Power supply and wiring
+- Mounting of the controller and compute boards
+
+### Status
+
+Not started in this repository yet. Component selection for the lidar, encoders and IMU is the next planned step. The team adds the parts list, schematics, photos and build notes below.
+
+### Work done
+
+_No entries yet._
 
 ---
 
-## Team workflow
+## Contributing
 
-1. Create a branch for your change: `git checkout -b feature/my-change`
-2. Edit only your own team's section of this README, and only your team's folders.
+1. Create a branch: `git checkout -b feature/my-change`
+2. Edit only your own team's section of this README and your own team's folders.
 3. Commit and push your branch.
 4. Open a pull request into `main` and ask a teammate for review.
 5. Keep `main` runnable: do not merge broken launch files or models.
