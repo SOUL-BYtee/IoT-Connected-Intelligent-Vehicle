@@ -74,11 +74,8 @@ The Data Engineering team turns the raw data the vehicle produces into something
 
 ### Status
 
-Not started in this repository yet. The team adds architecture notes, setup steps and results below.
+The team adds architecture notes, setup steps and results below.
 
-### Work done
-
-_No entries yet._
 
 ---
 
